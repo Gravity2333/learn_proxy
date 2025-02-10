@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxy中observer方法实现</title>
+</head>
+
+<body>
+    <script>
+        function observe(originObject) {
+            return new Proxy(originObject, {
+                get(target, propName, receiver) {
+                    console.log('属性' + propName + '被获取')
+                    const currentValue = Reflect.get(target, propName, receiver)
+                    if (typeof currentValue === 'object' && currentValue !== null) {
+                        // 访问到get的时候 创建新的proxy 后续再访问别的属性 就能检测到了 (lazy) 区别于DefineProperty
+                        return observe(currentValue)
+                    }
+                    return currentValue
+                },
+
+                set(target, propName, newValue, receiver) {
+                    console.log('属性' + propName + '被修改为:' + newValue)
+                    return Reflect.set(target, propName, newValue, receiver)
+                },
+            })
+        }
+
+        const obj = {
+            a: 100,
+            b: 200,
+            c: { c1: 100 }
+        }
+
+        const proxyObj = observe(obj)
+    </script>
+</body>
+
+</html>

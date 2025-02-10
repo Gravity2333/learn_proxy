@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>defineProperty使用</title>
+</head>
+
+<body>
+    <script>
+        const obj = {
+            _a: 100,
+            _b: 200,
+            _c: {
+                c1: 100,
+                c2: 200
+            },
+        }
+
+        Object.defineProperty(obj, 'a', {
+            get() {
+                console.log('obj的a属性被访问')
+                return obj._a
+            },
+
+            set(newValue) {
+                console.log('obj的a属性被修改 新的值为' + newValue)
+                obj._a = newValue
+            }
+        })
+
+        Object.defineProperty(obj, 'b', {
+            get() {
+                console.log('obj的b属性被访问')
+                return obj._b
+            },
+
+            set(newValue) {
+                console.log('obj的b属性被修改 新的值为' + newValue)
+                obj._b = newValue
+            }
+        })
+
+        Object.defineProperty(obj, 'c', {
+            get() {
+                console.log('obj的c属性被访问')
+                return obj._c
+            },
+
+            set(newValue) {
+                console.log('obj的c属性被修改 新的值为' + newValue)
+                obj._c = newValue
+            }
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxy基本使用</title>
+</head>
+
+<body>
+    <script>
+        const obj = {
+            a: 100,
+            b: 200,
+            c: {
+                c1: 100,
+                c2: 200,
+            },
+        };
+
+        const proxyObj = new Proxy(obj, {
+            get: (target, propName) => {
+                console.log("obj对象的" + propName + "被读取");
+                return target[propName];
+            },
+            set: (target, propName, newValue) => {
+                console.log("obj对象的" + propName + "被修改 新的值为:" + newValue);
+                target[propName] = newValue;
+            },
+            deleteProperty(target, propName) {
+                console.log("obj对象的" + propName + "属性 被删除!");
+                Reflect.deleteProperty(target, propName);
+            },
+        });
+    </script>
+</body>
+
+</html>

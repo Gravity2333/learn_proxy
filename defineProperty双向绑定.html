@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DefineProperty实现双向绑定</title>
+</head>
+
+<body>
+    input1: <input id="doubleInput" placeholder="双向绑定数据" />
+    <div>
+        输入值: <span id="displayValue"></span>
+    </div>
+    input2: <input id="doubleInput2" placeholder="双向绑定数据" />
+    <script>
+        function observe(originObject, onChange) {
+            Reflect.ownKeys(originObject).forEach(originKey => {
+                // 逐个属性添加代理
+                Reflect.defineProperty(originObject, originKey, {
+                    get() {
+                        const currentValue = Reflect.get(originObject, '_' + originKey)
+                        if (typeof currentValue === 'object' && currentValue !== null) {
+                            observe(currentValue, onChange)
+                        }
+                        return currentValue
+                    },
+
+                    set(newValue) {
+                        if (onChange) {
+                            onChange(originKey, newValue)
+                        }
+                        Reflect.set(originObject, '_' + originKey, newValue)
+                    }
+                })
+            })
+
+            return originObject
+        }
+
+        const doubleInput = document.querySelector('#doubleInput')
+        const displayValue = document.querySelector('#displayValue')
+        const doubleInput2 = document.querySelector('#doubleInput2')
+
+        const inputInfo = observe({
+            value: ''
+        }, (changeKey, newValue) => {
+            if (changeKey === 'value') {
+                doubleInput.value = newValue
+                doubleInput2.value = newValue
+                displayValue.textContent = newValue
+            }
+        })
+
+        doubleInput.addEventListener('input', (e) => {
+            inputInfo.value = e.target.value
+        })
+
+        doubleInput2.addEventListener('input', (e) => {
+            inputInfo.value = e.target.value
+        })
+    </script>
+</body>
+
+</html>
