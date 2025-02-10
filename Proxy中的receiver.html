@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const person = {
+            _name: "bill",
+            get name() {
+                return this._name;
+            },
+        };
+
+        const personProxy = new Proxy(person, {
+            get: (target, propName) => {
+                console.log("读取person的" + propName + "属性");
+                return target[propName];
+            },
+        });
+
+        console.log(personProxy.name); // bill 这个没问题
+
+        const student = {
+            id: "UWHDIUWOA(J@*HIDJWLOD",
+            _name: "Jack",
+        };
+
+        Object.setPrototypeOf(student, personProxy);
+
+        console.log(student.name); // 这里还是bill 因为在Proxy.get中 使用target[propName] 会丢失this 导致this指向person
+        // 这里需要使用 Reflect.get(,,receiver)
+
+        const reflectPersonProxy = new Proxy(person, {
+            get: (target, propName, receiver) => {
+                // 这里的reciver 指向真正的属性访问者
+                // 使用reflectPersonProxy.name时 receiver指向person对象
+                // 使用reflectPersonProxy的parent对象.name 时 receiver指向 parent对象
+                console.log("读取person的" + propName + "属性");
+                // 把receiver透传给Refelct.get 其会修改get访问器中this的指向
+                return Reflect.get(target, propName, receiver);
+            },
+        });
+
+        const student2 = {
+            id: "WHDIUWHDOIAJODJIWWD",
+            _name: "Jack",
+        };
+
+        Object.setPrototypeOf(student2, reflectPersonProxy);
+
+        console.log(student2.name); // Jack
+// console.log(reflectPersonProxy.name)
+    </script>
+</body>
+
+</html>
